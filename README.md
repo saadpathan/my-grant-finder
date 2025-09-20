@@ -71,3 +71,6 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+
+create an AI powered application (named MYMatch) that helps SMEs in Malaysia to get match with relevant grants, funding programs available for them from government, banks etc (ask them questions about their SME business and based on their input suggest the program that they are eligible for. I want to upload some pdf that contains some specific program details and want the system to go through those whenever an user come for matchmaking). then help them to apply to the program by guiding about the requiremnt, relevent links to apply etc.- use next.js, and environment that's alligns with AWS and gemini AI to power this with AI . don't ask user to upload the pdf, it should be uploaded beforehand in the backend. create a folder whrere all program info will be uploaded as pdf and AI will just go through them after user enters his business details. make it API friendly to that we can use any APIs we want for AI and DB
