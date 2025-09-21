@@ -8,7 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, ArrowRight, Building2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ArrowLeft, ArrowRight, Building2, AlertCircle, Loader2 } from "lucide-react";
+import { useBusinessProfile, useMatching } from "@/hooks/useApi";
+import { CreateBusinessProfileRequest, MatchBusinessRequest } from "@/types";
 
 interface BusinessQuestionnaireProps {
   onComplete: (data: any) => void;
@@ -41,6 +44,10 @@ export const BusinessQuestionnaire = ({ onComplete }: BusinessQuestionnaireProps
     challenges: ''
   });
 
+  const { loading: profileLoading, error: profileError, createBusinessProfile } = useBusinessProfile();
+  const { loading: matchingLoading, error: matchingError, findMatches } = useMatching();
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const industries = [
     'Technology & IT', 'Manufacturing', 'Retail & E-commerce', 'Food & Beverage',
     'Healthcare', 'Education', 'Agriculture', 'Construction', 'Financial Services',
@@ -71,11 +78,43 @@ export const BusinessQuestionnaire = ({ onComplete }: BusinessQuestionnaireProps
     }));
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (currentStep < totalSteps) {
       setCurrentStep(prev => prev + 1);
     } else {
-      onComplete(formData);
+      await handleSubmit();
+    }
+  };
+
+  const handleSubmit = async () => {
+    setIsProcessing(true);
+    try {
+      // Create business profile
+      const businessProfile = await createBusinessProfile(formData as CreateBusinessProfileRequest);
+      
+      // Find matches
+      const matchData: MatchBusinessRequest = {
+        businessProfileId: businessProfile.id,
+        industry: formData.industry,
+        stage: formData.stage,
+        employees: formData.employees,
+        revenue: formData.revenue,
+        fundingPurpose: formData.fundingPurpose,
+        fundingAmount: formData.fundingAmount,
+        location: formData.location,
+      };
+      
+      const matches = await findMatches(matchData);
+      
+      // Pass both business profile and matches to parent
+      onComplete({
+        businessProfile,
+        matches,
+      });
+    } catch (error) {
+      console.error('Error processing questionnaire:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -86,6 +125,7 @@ export const BusinessQuestionnaire = ({ onComplete }: BusinessQuestionnaireProps
   };
 
   const progress = (currentStep / totalSteps) * 100;
+  const isLoading = profileLoading || matchingLoading || isProcessing;
 
   return (
     <div className="min-h-screen bg-background py-12">
@@ -100,6 +140,16 @@ export const BusinessQuestionnaire = ({ onComplete }: BusinessQuestionnaireProps
             Help us understand your business to find the perfect grant matches
           </p>
         </div>
+
+        {/* Error Display */}
+        {(profileError || matchingError) && (
+          <Alert className="mb-6 border-destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {profileError || matchingError}
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Progress */}
         <div className="mb-8">
@@ -367,10 +417,20 @@ export const BusinessQuestionnaire = ({ onComplete }: BusinessQuestionnaireProps
               
               <Button 
                 onClick={nextStep}
+                disabled={isLoading}
                 className="flex items-center gap-2 bg-gradient-primary hover:opacity-90"
               >
-                {currentStep === totalSteps ? 'Find My Matches' : 'Next Step'}
-                <ArrowRight className="h-4 w-4" />
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {currentStep === totalSteps ? 'Finding Matches...' : 'Processing...'}
+                  </>
+                ) : (
+                  <>
+                    {currentStep === totalSteps ? 'Find My Matches' : 'Next Step'}
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
               </Button>
             </div>
           </CardContent>

@@ -1,31 +1,44 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Building2, TrendingUp, FileText, ArrowRight, Users, Award, Banknote } from "lucide-react";
 import { BusinessQuestionnaire } from "@/components/BusinessQuestionnaire";
 import { ProgramResults } from "@/components/ProgramResults";
+import { useAppState } from "@/hooks/useApi";
+import { useGrantPrograms } from "@/hooks/useApi";
 import heroImage from "@/assets/hero-bg.jpg";
 
 const Index = () => {
-  const [currentStep, setCurrentStep] = useState<'landing' | 'questionnaire' | 'results'>('landing');
-  const [businessData, setBusinessData] = useState(null);
+  const { 
+    currentStep, 
+    businessData, 
+    handleStartAssessment, 
+    handleQuestionnaireComplete, 
+    handleBackToLanding 
+  } = useAppState();
+  
+  const { seedInitialData } = useGrantPrograms();
 
-  const handleStartAssessment = () => {
-    setCurrentStep('questionnaire');
-  };
-
-  const handleQuestionnaireComplete = (data: any) => {
-    setBusinessData(data);
-    setCurrentStep('results');
-  };
+  // Seed initial data on component mount
+  useEffect(() => {
+    const initializeData = async () => {
+      try {
+        await seedInitialData();
+      } catch (error) {
+        console.error('Failed to seed initial data:', error);
+      }
+    };
+    
+    initializeData();
+  }, [seedInitialData]);
 
   if (currentStep === 'questionnaire') {
     return <BusinessQuestionnaire onComplete={handleQuestionnaireComplete} />;
   }
 
   if (currentStep === 'results') {
-    return <ProgramResults businessData={businessData} onBack={() => setCurrentStep('landing')} />;
+    return <ProgramResults businessData={businessData} onBack={handleBackToLanding} />;
   }
 
   return (
