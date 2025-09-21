@@ -78,13 +78,6 @@ const Index = () => {
               Start Free Assessment
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="border-white text-white hover:bg-white hover:text-primary px-8 py-4 text-lg"
-            >
-              View Success Stories
-            </Button>
           </div>
           
           {/* Stats */}
