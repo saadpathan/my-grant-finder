@@ -339,7 +339,7 @@ export class ApiService {
             "Access to certified digital solution providers",
             "Post-implementation monitoring and support"
           ],
-          applicationLink: "https://www.mdec.my/what-we-offer/grants-programs/sme-digitalization-grant/",
+          applicationLink: "https://mdec.my/grants/mdag",
           deadline: "31 December 2024",
           processingTime: "8-12 weeks",
           status: "Open for Applications",
@@ -370,7 +370,7 @@ export class ApiService {
             "Minimal documentation required",
             "Quick approval process"
           ],
-          applicationLink: "https://www.smebank.com.my/financing/micro-financing",
+          applicationLink: "https://www.smebank.com.my/business-accelerator-programme",
           deadline: "Ongoing",
           processingTime: "2-4 weeks",
           status: "Always Available",
@@ -400,7 +400,7 @@ export class ApiService {
             "Market linkage opportunities",
             "Capacity building programs"
           ],
-          applicationLink: "https://www.smecorp.gov.my/index.php/en/programmes/financial-assistance",
+          applicationLink: "https://smecorp.gov.my/index.php/en/programmes1/2015-12-21-10-03-39/bumiputera-enterprise-enhancement-programme-beep",
           deadline: "Quarterly intake",
           processingTime: "12-16 weeks",
           status: "Next Intake: Q1 2024",

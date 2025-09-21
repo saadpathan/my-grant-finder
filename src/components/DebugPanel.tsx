@@ -6,8 +6,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle, XCircle, Loader2, Database, Users, Award } from "lucide-react";
 import { ApiService } from "@/services/api";
 import { useBusinessProfile, useGrantPrograms } from "@/hooks/useApi";
-import { createSimpleTables } from "@/utils/simpleCreateTables";
-import { testConnection } from "@/utils/testConnection";
+//import { createSimpleTables } from "@/utils/simpleCreateTables";
+//import { testConnection } from "@/utils/testConnection";
 
 // Helper to check AWS env variables
 function checkAwsEnvVars() {
