@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MYMatch Backend Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔧 MYMatch Backend Connection Test</h1>
+    
+    <div id="results"></div>
+    
+    <button onclick="testConnection()">Test Backend Connection</button>
+    <button onclick="clearResults()">Clear Results</button>
+    
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function testConnection() {
+            clearResults();
+            addResult('🚀 Starting backend connection test...', 'info');
+            
+            // Test 1: Check if we can access the API service
+            try {
+                addResult('1. Testing API Service Import...', 'info');
+                
+                // This will only work if the app is running
+                const response = await fetch('/src/services/api.ts');
+                if (response.ok) {
+                    addResult('✅ API service file accessible', 'success');
+                } else {
+                    addResult('⚠️ API service file not accessible (this is normal if not running the dev server)', 'info');
+                }
+            } catch (error) {
+                addResult('⚠️ Cannot test API service (app not running)', 'info');
+            }
+            
+            // Test 2: Check environment variables (if available)
+            addResult('2. Checking Environment Variables...', 'info');
+            
+            const envVars = [
+                'VITE_AWS_REGION',
+                'VITE_AWS_ACCESS_KEY_ID',
+                'VITE_AWS_SECRET_ACCESS_KEY',
+                'VITE_BUSINESS_PROFILES_TABLE',
+                'VITE_GRANT_PROGRAMS_TABLE',
+                'VITE_MATCH_RESULTS_TABLE'
+            ];
+            
+            let envStatus = 'Environment variables check:';
+            envVars.forEach(varName => {
+                // In a real app, these would be available via import.meta.env
+                envStatus += `<br/>${varName}: ${window.location.hostname.includes('localhost') ? 'Available in dev' : 'Check .env file'}`;
+            });
+            
+            addResult(envStatus, 'info');
+            
+            // Test 3: Instructions
+            addResult('3. Manual Verification Steps:', 'info');
+            addResult(`
+                <strong>To verify your backend is working:</strong><br/>
+                <br/>
+                1. <strong>Start your app:</strong> Run <code>npm run dev</code><br/>
+                2. <strong>Open the app:</strong> Go to <code>http://localhost:8080</code><br/>
+                3. <strong>Use Debug Panel:</strong> Click the "Debug Backend" button (bottom-right)<br/>
+                4. <strong>Run Tests:</strong> Click "Test Backend Connection"<br/>
+                <br/>
+                <strong>What to look for:</strong><br/>
+                • ✅ All environment variables are set<br/>
+                • ✅ DynamoDB connection successful<br/>
+                • ✅ Data seeding completed<br/>
+                • ✅ Read/write operations working<br/>
+                <br/>
+                <strong>If you see errors:</strong><br/>
+                • Check your .env file has correct AWS credentials<br/>
+                • Verify DynamoDB tables exist in AWS Console<br/>
+                • Ensure tables are in the correct region<br/>
+            `, 'info');
+            
+            addResult('4. Quick AWS DynamoDB Check:', 'info');
+            addResult(`
+                <strong>Check your AWS Console:</strong><br/>
+                1. Go to <a href="https://console.aws.amazon.com/dynamodb/" target="_blank">AWS DynamoDB Console</a><br/>
+                2. Look for these tables:<br/>
+                • MYMatch-BusinessProfiles<br/>
+                • MYMatch-GrantPrograms<br/>
+                • MYMatch-MatchResults<br/>
+                3. If tables exist, your backend setup is correct!<br/>
+                4. If no tables, follow the DYNAMODB_SETUP.md guide<br/>
+            `, 'info');
+        }
+        
+        // Auto-run test on page load
+        window.onload = function() {
+            addResult('📋 Backend Test Page Loaded', 'info');
+            addResult('Click "Test Backend Connection" to run diagnostics', 'info');
+        };
+    </script>
+</body>
+</html>

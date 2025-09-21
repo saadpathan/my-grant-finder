@@ -1,12 +1,32 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { fromEnv } from '@aws-sdk/credential-providers';
 
 // AWS Configuration
 const awsConfig = {
   region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
-  credentials: fromEnv(),
+  credentials: {
+    accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID || '',
+    secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY || '',
+  },
 };
+
+// Validate credentials
+console.log('🔍 AWS Configuration Debug:');
+console.log('Region:', awsConfig.region);
+console.log('Access Key ID:', awsConfig.credentials.accessKeyId ? 'Set' : 'Not set');
+console.log('Secret Access Key:', awsConfig.credentials.secretAccessKey ? 'Set' : 'Not set');
+
+if (!awsConfig.credentials.accessKeyId || !awsConfig.credentials.secretAccessKey) {
+  console.error('❌ AWS credentials not found in environment variables');
+  console.error('Please check your .env file contains:');
+  console.error('VITE_AWS_ACCESS_KEY_ID=your-access-key');
+  console.error('VITE_AWS_SECRET_ACCESS_KEY=your-secret-key');
+  console.error('Current values:');
+  console.error('VITE_AWS_ACCESS_KEY_ID:', import.meta.env.VITE_AWS_ACCESS_KEY_ID);
+  console.error('VITE_AWS_SECRET_ACCESS_KEY:', import.meta.env.VITE_AWS_SECRET_ACCESS_KEY);
+} else {
+  console.log('✅ AWS credentials are set');
+}
 
 // Create DynamoDB client
 const dynamoClient = new DynamoDBClient(awsConfig);

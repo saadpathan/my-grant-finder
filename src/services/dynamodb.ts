@@ -1,3 +1,7 @@
+
+
+
+
 import { 
   PutCommand, 
   GetCommand, 
@@ -9,16 +13,44 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { docClient, TABLES } from '@/config/aws';
 import { v4 as uuidv4 } from 'uuid';
-import { 
-  BusinessProfile, 
-  GrantProgram, 
-  MatchResult, 
+import {
+  BusinessProfile,
+  GrantProgram,
+  MatchResult,
   CreateBusinessProfileRequest,
   UpdateBusinessProfileRequest,
   CreateGrantProgramRequest,
   MatchBusinessRequest
 } from '@/types';
 
+
+
+
+// import { analyzeWithAI } from './ai';
+
+  // const profiles = await BusinessProfileService.getAll();
+  // for (const profile of profiles) {
+  //   // Map BusinessProfile to MatchBusinessRequest
+  //   const matchRequest: MatchBusinessRequest = {
+  //     businessProfileId: profile.id,
+  //     industry: profile.industry,
+  //     stage: profile.stage,
+  //     employees: profile.employees,
+  //     revenue: profile.revenue,
+  //     fundingPurpose: profile.fundingPurpose,
+  //     fundingAmount: profile.fundingAmount,
+  //     location: profile.location,
+  //   };
+  //   const aiMatches = await analyzeWithAI(matchRequest); // Send to AI
+  //   for (const match of aiMatches) {
+  //     await MatchResultService.createMatch(
+  //       profile.id,
+  //       match.grantProgramId,
+  //       match.matchScore,
+  //       match.reasons
+  //     );
+  //   }
+  // }
 // Business Profile Operations
 export class BusinessProfileService {
   static async create(data: CreateBusinessProfileRequest): Promise<BusinessProfile> {
@@ -50,7 +82,7 @@ export class BusinessProfileService {
   }
 
   static async update(id: string, data: Partial<CreateBusinessProfileRequest>): Promise<BusinessProfile | null> {
-    const updateExpression = 'SET updatedAt = :updatedAt';
+    let updateExpression = 'SET updatedAt = :updatedAt';
     const expressionAttributeValues: any = {
       ':updatedAt': new Date().toISOString(),
     };
@@ -94,75 +126,97 @@ export class BusinessProfileService {
 // Grant Program Operations
 export class GrantProgramService {
   static async create(data: CreateGrantProgramRequest): Promise<GrantProgram> {
-    const id = uuidv4();
-    const now = new Date().toISOString();
-    
-    const grantProgram: GrantProgram = {
-      id,
-      ...data,
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    await docClient.send(new PutCommand({
-      TableName: TABLES.GRANT_PROGRAMS,
-      Item: grantProgram,
-    }));
-
-    return grantProgram;
+    try {
+      const id = uuidv4();
+      const now = new Date().toISOString();
+      const grantProgram: GrantProgram = {
+        id,
+        ...data,
+        createdAt: now,
+        updatedAt: now,
+      };
+      await docClient.send(new PutCommand({
+        TableName: TABLES.GRANT_PROGRAMS,
+        Item: grantProgram,
+      }));
+      return grantProgram;
+    } catch (error) {
+      console.error('GrantProgramService.create error:', error);
+      throw new Error(`GrantProgramService.create failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   static async getById(id: string): Promise<GrantProgram | null> {
-    const result = await docClient.send(new GetCommand({
-      TableName: TABLES.GRANT_PROGRAMS,
-      Key: { id },
-    }));
-
-    return result.Item as GrantProgram || null;
+    try {
+      const result = await docClient.send(new GetCommand({
+        TableName: TABLES.GRANT_PROGRAMS,
+        Key: { id },
+      }));
+      return result.Item as GrantProgram || null;
+    } catch (error) {
+      console.error('GrantProgramService.getById error:', error);
+      throw new Error(`GrantProgramService.getById failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   static async getAll(): Promise<GrantProgram[]> {
-    const result = await docClient.send(new ScanCommand({
-      TableName: TABLES.GRANT_PROGRAMS,
-    }));
-
-    return result.Items as GrantProgram[] || [];
+    try {
+      const result = await docClient.send(new ScanCommand({
+        TableName: TABLES.GRANT_PROGRAMS,
+      }));
+      return result.Items as GrantProgram[] || [];
+    } catch (error) {
+      console.error('GrantProgramService.getAll error:', error);
+      throw new Error(`GrantProgramService.getAll failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   static async findByIndustry(industry: string): Promise<GrantProgram[]> {
-    const result = await docClient.send(new ScanCommand({
-      TableName: TABLES.GRANT_PROGRAMS,
-      FilterExpression: 'contains(industry, :industry)',
-      ExpressionAttributeValues: {
-        ':industry': industry,
-      },
-    }));
-
-    return result.Items as GrantProgram[] || [];
+    try {
+      const result = await docClient.send(new ScanCommand({
+        TableName: TABLES.GRANT_PROGRAMS,
+        FilterExpression: 'contains(industry, :industry)',
+        ExpressionAttributeValues: {
+          ':industry': industry,
+        },
+      }));
+      return result.Items as GrantProgram[] || [];
+    } catch (error) {
+      console.error('GrantProgramService.findByIndustry error:', error);
+      throw new Error(`GrantProgramService.findByIndustry failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   static async findByBusinessStage(stage: string): Promise<GrantProgram[]> {
-    const result = await docClient.send(new ScanCommand({
-      TableName: TABLES.GRANT_PROGRAMS,
-      FilterExpression: 'contains(businessStage, :stage)',
-      ExpressionAttributeValues: {
-        ':stage': stage,
-      },
-    }));
-
-    return result.Items as GrantProgram[] || [];
+    try {
+      const result = await docClient.send(new ScanCommand({
+        TableName: TABLES.GRANT_PROGRAMS,
+        FilterExpression: 'contains(businessStage, :stage)',
+        ExpressionAttributeValues: {
+          ':stage': stage,
+        },
+      }));
+      return result.Items as GrantProgram[] || [];
+    } catch (error) {
+      console.error('GrantProgramService.findByBusinessStage error:', error);
+      throw new Error(`GrantProgramService.findByBusinessStage failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   static async findByFundingPurpose(purpose: string): Promise<GrantProgram[]> {
-    const result = await docClient.send(new ScanCommand({
-      TableName: TABLES.GRANT_PROGRAMS,
-      FilterExpression: 'contains(fundingPurpose, :purpose)',
-      ExpressionAttributeValues: {
-        ':purpose': purpose,
-      },
-    }));
-
-    return result.Items as GrantProgram[] || [];
+    try {
+      const result = await docClient.send(new ScanCommand({
+        TableName: TABLES.GRANT_PROGRAMS,
+        FilterExpression: 'contains(fundingPurpose, :purpose)',
+        ExpressionAttributeValues: {
+          ':purpose': purpose,
+        },
+      }));
+      return result.Items as GrantProgram[] || [];
+    } catch (error) {
+      console.error('GrantProgramService.findByFundingPurpose error:', error);
+      throw new Error(`GrantProgramService.findByFundingPurpose failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   static async batchCreate(programs: CreateGrantProgramRequest[]): Promise<GrantProgram[]> {
@@ -200,6 +254,7 @@ export class GrantProgramService {
 
 // Match Result Operations
 export class MatchResultService {
+
   static async createMatch(businessProfileId: string, grantProgramId: string, matchScore: number, reasons: string[]): Promise<MatchResult> {
     const id = uuidv4();
     const now = new Date().toISOString();

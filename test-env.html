@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environment Variables Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Environment Variables Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+        
+        // Test environment variables
+        addResult('Testing Environment Variables...', 'info');
+        
+        const envVars = [
+            'VITE_AWS_REGION',
+            'VITE_AWS_ACCESS_KEY_ID',
+            'VITE_AWS_SECRET_ACCESS_KEY',
+            'VITE_BUSINESS_PROFILES_TABLE',
+            'VITE_GRANT_PROGRAMS_TABLE',
+            'VITE_MATCH_RESULTS_TABLE'
+        ];
+        
+        let allSet = true;
+        
+        envVars.forEach(varName => {
+            // In Vite, environment variables are available via import.meta.env
+            // But in this HTML file, we can't access them directly
+            // This is just to show you what should be set
+            addResult(`${varName}: <em>Check browser console for actual values</em>`, 'info');
+        });
+        
+        addResult(`
+            <strong>To fix the "Failed to fetch" error:</strong><br/><br/>
+            
+            <strong>1. Create .env file in project root:</strong><br/>
+            <pre>VITE_AWS_REGION=us-east-1
+VITE_AWS_ACCESS_KEY_ID=your_actual_access_key
+VITE_AWS_SECRET_ACCESS_KEY=your_actual_secret_key
+VITE_BUSINESS_PROFILES_TABLE=MYMatch-BusinessProfiles
+VITE_GRANT_PROGRAMS_TABLE=MYMatch-GrantPrograms
+VITE_MATCH_RESULTS_TABLE=MYMatch-MatchResults</pre>
+            
+            <strong>2. Get AWS credentials:</strong><br/>
+            • Go to <a href="https://console.aws.amazon.com/" target="_blank">AWS Console</a><br/>
+            • Click your username → Security credentials<br/>
+            • Create access key → Application running outside AWS<br/>
+            • Copy Access Key ID and Secret Access Key<br/><br/>
+            
+            <strong>3. Restart the app:</strong><br/>
+            <pre>npm run dev</pre>
+            
+            <strong>4. Check browser console:</strong><br/>
+            • Open Developer Tools (F12)<br/>
+            • Go to Console tab<br/>
+            • Look for environment variable warnings<br/>
+            • You should see your actual values, not "your_access_key_here"<br/><br/>
+            
+            <strong>5. Test the connection:</strong><br/>
+            • Use the Debug Panel in the app<br/>
+            • Click "Test Backend Connection"<br/>
+            • All tests should show green checkmarks ✅
+        `, 'info');
+        
+        // Try to access environment variables if possible
+        addResult('Checking if we can access environment variables...', 'info');
+        
+        if (typeof import !== 'undefined' && import.meta && import.meta.env) {
+            addResult('✅ import.meta.env is available', 'success');
+            envVars.forEach(varName => {
+                const value = import.meta.env[varName];
+                if (value) {
+                    addResult(`✅ ${varName}: ${varName.includes('KEY') ? '***hidden***' : value}`, 'success');
+                } else {
+                    addResult(`❌ ${varName}: Not set`, 'error');
+                    allSet = false;
+                }
+            });
+        } else {
+            addResult('❌ Cannot access import.meta.env in this context', 'error');
+            addResult('This is normal - the .env file needs to be loaded by Vite', 'info');
+        }
+        
+        if (allSet) {
+            addResult('🎉 All environment variables are set!', 'success');
+        } else {
+            addResult('❌ Some environment variables are missing!', 'error');
+        }
+    </script>
+</body>
+</html>

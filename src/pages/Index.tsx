@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Building2, TrendingUp, FileText, ArrowRight, Users, Award, Banknote } from "lucide-react";
 import { BusinessQuestionnaire } from "@/components/BusinessQuestionnaire";
 import { ProgramResults } from "@/components/ProgramResults";
+import { DebugPanel } from "@/components/DebugPanel";
 import { useAppState } from "@/hooks/useApi";
 import { useGrantPrograms } from "@/hooks/useApi";
 import heroImage from "@/assets/hero-bg.jpg";
@@ -43,6 +44,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <DebugPanel />
       {/* Hero Section */}
       <section 
         className="relative min-h-screen flex items-center justify-center bg-gradient-hero overflow-hidden"

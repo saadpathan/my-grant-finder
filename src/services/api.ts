@@ -304,8 +304,13 @@ export class ApiService {
   // Utility method to seed initial data
   static async seedInitialData(): Promise<ApiResponse<{ businessProfiles: number; grantPrograms: number }>> {
     try {
+      console.log('🌱 Starting data seeding process...');
+      
       // Check if data already exists
+      console.log('🔍 Checking for existing grant programs...');
       const existingPrograms = await GrantProgramService.getAll();
+      console.log(`Found ${existingPrograms.length} existing programs`);
+      
       if (existingPrograms.length > 0) {
         return {
           success: true,
@@ -409,7 +414,9 @@ export class ApiService {
         }
       ];
 
+      console.log('📝 Creating initial grant programs...');
       const createdPrograms = await GrantProgramService.batchCreate(initialPrograms);
+      console.log(`✅ Successfully created ${createdPrograms.length} grant programs`);
 
       return {
         success: true,
@@ -417,7 +424,12 @@ export class ApiService {
         message: `Successfully seeded ${createdPrograms.length} grant programs`,
       };
     } catch (error) {
-      console.error('Error seeding initial data:', error);
+      console.error('❌ Error seeding initial data:', error);
+      console.error('Error details:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to seed initial data',
